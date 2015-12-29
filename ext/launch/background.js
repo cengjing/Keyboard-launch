@@ -12,6 +12,8 @@ chrome.alarms.onAlarm.addListener(checkMsg);
 //var a = new RegExp("有(.*?)条新私信");
 //a.exec(data)[1];
 
+//http://www.zhihu.com/noti7/readall 知乎私信接口
+
 //http://www.zhihu.com/noti7/new知乎消息：回答关注问题、感谢、关注
 
 //匹配知乎新关注用户名 http://www.zhihu.com/noti7/calendar
@@ -28,7 +30,7 @@ chrome.alarms.onAlarm.addListener(checkMsg);
 
 
 function checkMsg(){
-    getCookie('newMsg') || bread;
+    if(!getCookie('newMsg')) return(0);
     //check weibo
     if (getCookie('msg_weibo')){
         $.get("http://rm.api.weibo.com/2/remind/push_count.json?source=3818214747",function(data,status){
@@ -73,9 +75,11 @@ function checkMsg(){
     if (getCookie('msg_v2ex')){
         $.get("https://www.v2ex.com/settings",function(data,status){
             if(status == 'success'){
-                var a = new RegExp("([0-9]*?) 条未读提醒");
-                var sign = a.exec(data)[1];
-                if(sign!='0'){
+                var sign = RegExp("([0-9]*?) 条未读提醒").exec(data);
+                sign = sign != null && sign[1] || '未登录';
+                if ( sign == '未登录' ){
+                    alert('v2ex 未登录');
+                }else if(sign!='0'){
                     setCookie('msg_v2ex', 'n');
                 }else{
                     setCookie('msg_v2ex', 't');
